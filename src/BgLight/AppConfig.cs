@@ -38,7 +38,7 @@ namespace BgLight
             var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var arg in args)
             {
-                if (string.IsNullOrEmpty(arg) || !arg.StartsWith("/"))
+                if (string.IsNullOrEmpty(arg) || !arg.StartsWith("/", System.StringComparison.Ordinal))
                 {
                     continue;
                 }
@@ -51,7 +51,9 @@ namespace BgLight
                 }
 
                 var key = body.Substring(0, eq).Trim();
-                var value = body.Substring(eq + 1).Trim().Trim('"');
+                var value = body.Substring(eq + 1).Trim();
+                if (value.Length >= 2 && value[0] == '"' && value[value.Length - 1] == '"')
+                    value = value.Substring(1, value.Length - 2);
                 map[key] = value;
             }
 

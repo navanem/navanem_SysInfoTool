@@ -1,5 +1,4 @@
 using System.Drawing;
-using System.IO;
 using Xunit;
 
 namespace BgLight.Tests
@@ -64,6 +63,13 @@ namespace BgLight.Tests
             Assert.Equal(11f, c.FontSize);
             Assert.Equal(PanelPosition.TopLeft, c.Position);
             Assert.Equal(ColorTranslator.FromHtml("#202020"), c.BgColor);
+        }
+
+        [Fact]
+        public void Only_one_outer_quote_pair_is_removed()
+        {
+            var c = AppConfig.Parse(new[] { "/fontName=\"\"Consolas\"\"" });
+            Assert.Equal("\"Consolas\"", c.FontName);
         }
     }
 }
