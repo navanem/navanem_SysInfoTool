@@ -16,8 +16,11 @@ namespace BgLight
 
         public static void Apply(string imagePath)
         {
+            // SystemParametersInfo exige un chemin absolu.
+            imagePath = System.IO.Path.GetFullPath(imagePath);
+
             // Style "Remplir" (Fill)
-            using (var key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", writable: true))
+            using (var key = Registry.CurrentUser.CreateSubKey(@"Control Panel\Desktop"))
             {
                 if (key != null)
                 {

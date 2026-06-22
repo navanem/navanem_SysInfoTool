@@ -31,5 +31,11 @@ namespace BgLight.Tests
         {
             Assert.Equal("N/A", Format.Join(Array.Empty<string>()));
         }
+
+        [Fact]
+        public void Join_filters_empty_and_whitespace_values()
+        {
+            Assert.Equal("10.0.0.1", Format.Join(new[] { "", "  ", "10.0.0.1" }));
+        }
     }
 }

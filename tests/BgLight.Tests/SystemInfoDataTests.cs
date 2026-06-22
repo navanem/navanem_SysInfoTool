@@ -9,7 +9,14 @@ namespace BgLight.Tests
         {
             var d = new SystemInfoData();
             Assert.Equal("N/A", d.ComputerName);
+            Assert.Equal("N/A", d.User);
             Assert.Equal("N/A", d.IPv4);
+            Assert.Equal("N/A", d.OsVersion);
+            Assert.Equal("N/A", d.RamTotal);
+            Assert.Equal("N/A", d.RamUsed);
+            Assert.Equal("N/A", d.DiskTotal);
+            Assert.Equal("N/A", d.DiskFree);
+            Assert.Equal("N/A", d.DomainOrWorkgroup);
             Assert.Equal("N/A", d.GeneratedAt);
         }
 

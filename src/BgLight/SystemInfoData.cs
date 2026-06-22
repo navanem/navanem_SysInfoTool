@@ -24,7 +24,7 @@ namespace BgLight
                 "IPv4        : " + IPv4,
                 "OS          : " + OsVersion,
                 "RAM         : " + RamUsed + " / " + RamTotal,
-                "Disque C:   : " + DiskFree + " libre / " + DiskTotal,
+                "Disque (C:)  : " + DiskFree + " libre / " + DiskTotal,
                 "Domaine     : " + DomainOrWorkgroup,
                 "Genere le   : " + GeneratedAt,
                 "" // ligne de respiration en bas du panneau

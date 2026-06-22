@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -68,18 +69,26 @@ namespace BgLight
 
         private static PointF PanelOrigin(PanelPosition pos, int width, int height, float pw, float ph)
         {
+            float x, y;
             switch (pos)
             {
                 case PanelPosition.TopRight:
-                    return new PointF(width - PanelMargin - pw, PanelMargin);
+                    x = width - PanelMargin - pw; y = PanelMargin;
+                    break;
                 case PanelPosition.BottomLeft:
-                    return new PointF(PanelMargin, height - PanelMargin - ph);
+                    x = PanelMargin; y = height - PanelMargin - ph;
+                    break;
                 case PanelPosition.BottomRight:
-                    return new PointF(width - PanelMargin - pw, height - PanelMargin - ph);
+                    x = width - PanelMargin - pw; y = height - PanelMargin - ph;
+                    break;
                 case PanelPosition.TopLeft:
                 default:
-                    return new PointF(PanelMargin, PanelMargin);
+                    x = PanelMargin; y = PanelMargin;
+                    break;
             }
+
+            // Ne jamais démarrer hors écran (grande police / petite résolution).
+            return new PointF(Math.Max(0f, x), Math.Max(0f, y));
         }
     }
 }
