@@ -12,7 +12,8 @@ namespace BgLight.Tests
 
             Assert.Equal(@"C:\ProgramData\BgLight\wallpaper_info.bmp", c.OutputPath);
             Assert.Equal(11f, c.FontSize);
-            Assert.Equal(PanelPosition.TopLeft, c.Position);
+            Assert.Equal(PanelPosition.TopRight, c.Position);
+            Assert.Equal(ColorTranslator.FromHtml("#0078D4"), c.AccentColor);
             Assert.Equal(ColorTranslator.FromHtml("#202020"), c.BgColor);
             Assert.Equal("Segoe UI", c.FontName);
         }
@@ -57,11 +58,13 @@ namespace BgLight.Tests
             {
                 "/fontSize=notanumber",
                 "/position=Sideways",
-                "/bgColor=notacolor"
+                "/bgColor=notacolor",
+                "/accentColor=nope"
             });
 
             Assert.Equal(11f, c.FontSize);
-            Assert.Equal(PanelPosition.TopLeft, c.Position);
+            Assert.Equal(PanelPosition.TopRight, c.Position);
+            Assert.Equal(ColorTranslator.FromHtml("#0078D4"), c.AccentColor);
             Assert.Equal(ColorTranslator.FromHtml("#202020"), c.BgColor);
         }
 
@@ -70,6 +73,13 @@ namespace BgLight.Tests
         {
             var c = AppConfig.Parse(new[] { "/fontName=\"\"Consolas\"\"" });
             Assert.Equal("\"Consolas\"", c.FontName);
+        }
+
+        [Fact]
+        public void Parses_accent_color()
+        {
+            var c = AppConfig.Parse(new[] { "/accentColor=#FF8800" });
+            Assert.Equal(ColorTranslator.FromHtml("#FF8800"), c.AccentColor);
         }
     }
 }

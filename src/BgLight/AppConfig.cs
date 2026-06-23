@@ -10,9 +10,10 @@ namespace BgLight
     {
         public string OutputPath { get; private set; } = @"C:\ProgramData\BgLight\wallpaper_info.bmp";
         public float FontSize { get; private set; } = 11f;
-        public PanelPosition Position { get; private set; } = PanelPosition.TopLeft;
+        public PanelPosition Position { get; private set; } = PanelPosition.TopRight;
         public Color BgColor { get; private set; } = ColorTranslator.FromHtml("#202020");
         public string FontName { get; private set; } = "Segoe UI";
+        public Color AccentColor { get; private set; } = ColorTranslator.FromHtml("#0078D4");
 
         public string LogPath
         {
@@ -92,6 +93,18 @@ namespace BgLight
             if (map.TryGetValue("fontName", out s) && !string.IsNullOrWhiteSpace(s))
             {
                 config.FontName = s;
+            }
+
+            if (map.TryGetValue("accentColor", out s))
+            {
+                try
+                {
+                    config.AccentColor = ColorTranslator.FromHtml(s);
+                }
+                catch
+                {
+                    // garde le défaut
+                }
             }
 
             return config;
