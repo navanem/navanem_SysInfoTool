@@ -24,7 +24,14 @@ namespace BgLight
 
         public static void Render(SystemInfoData data, AppConfig config, int width, int height)
         {
-            var rows = data.Rows();
+            var rows = new List<(string Label, string Value)>();
+            foreach (var section in data.Sections())
+            {
+                foreach (var r in section.Rows)
+                {
+                    rows.Add(r);
+                }
+            }
 
             using (var bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb))
             using (var graphics = Graphics.FromImage(bitmap))
