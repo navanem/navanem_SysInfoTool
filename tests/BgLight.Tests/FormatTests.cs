@@ -8,16 +8,16 @@ namespace BgLight.Tests
         [Fact]
         public void Giga_converts_bytes_to_gigabytes_one_decimal()
         {
-            // 64 Go = 64 * 1024^3 octets
+            // 64 GB = 64 * 1024^3 bytes
             ulong bytes = 64UL * 1024 * 1024 * 1024;
-            Assert.Equal("64.0 Go", Format.Giga(bytes));
+            Assert.Equal("64.0 GB", Format.Giga(bytes));
         }
 
         [Fact]
         public void Giga_rounds_to_one_decimal()
         {
             ulong bytes = (ulong)(1.58 * 1024 * 1024 * 1024);
-            Assert.Equal("1.6 Go", Format.Giga(bytes));
+            Assert.Equal("1.6 GB", Format.Giga(bytes));
         }
 
         [Fact]

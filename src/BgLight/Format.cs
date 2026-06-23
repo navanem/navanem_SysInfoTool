@@ -9,7 +9,7 @@ namespace BgLight
         public static string Giga(ulong bytes)
         {
             double gb = bytes / (1024.0 * 1024.0 * 1024.0);
-            return gb.ToString("0.0", CultureInfo.InvariantCulture) + " Go";
+            return gb.ToString("0.0", CultureInfo.InvariantCulture) + " GB";
         }
 
         public static string Join(IEnumerable<string> values)
