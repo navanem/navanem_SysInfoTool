@@ -44,7 +44,6 @@ namespace BgLight
             using (var footerFont = new Font(config.FontName, Math.Max(7f, config.FontSize - 2f), FontStyle.Regular, GraphicsUnit.Point))
             using (var textBrush = new SolidBrush(Color.FromArgb(240, 240, 240)))
             using (var labelBrush = new SolidBrush(Color.FromArgb(170, 170, 170)))
-            using (var sectionBrush = new SolidBrush(config.AccentColor))
             using (var footerBrush = new SolidBrush(Color.FromArgb(140, 140, 140)))
             using (var panelBrush = new SolidBrush(Color.FromArgb(120, 0, 0, 0)))
             using (var shadowBrush = new SolidBrush(Color.FromArgb(90, 0, 0, 0)))
@@ -94,7 +93,7 @@ namespace BgLight
 
                 float panelWidth = contentWidth + PanelPadding * 2;
                 float panelHeight = contentHeight + PanelPadding * 2;
-                float valueX = labelColWidth + ColumnGap;
+                float valueOffsetX = labelColWidth + ColumnGap;
 
                 void DrawPanelAt(float ox, float oy)
                 {
@@ -122,12 +121,12 @@ namespace BgLight
 
                     for (int i = 0; i < sections.Count; i++)
                     {
-                        graphics.DrawString(sections[i].Title, sectionFont, sectionBrush, x, y);
+                        graphics.DrawString(sections[i].Title, sectionFont, accentBrush, x, y);
                         y += sectionHeight + SectionTitleGap;
                         foreach (var r in sections[i].Rows)
                         {
                             graphics.DrawString(r.Label, font, labelBrush, x, y);
-                            graphics.DrawString(r.Value, font, textBrush, x + valueX, y);
+                            graphics.DrawString(r.Value, font, textBrush, x + valueOffsetX, y);
                             y += lineHeight;
                         }
                         if (i < sections.Count - 1) y += SectionGap;

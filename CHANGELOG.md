@@ -4,6 +4,16 @@ All notable changes to BgLight. Format inspired by
 [Keep a Changelog](https://keepachangelog.com/), versions follow
 [SemVer](https://semver.org/).
 
+## [1.3.1] - 2026-06-23
+
+### Changed
+- DNS now reflects the primary (first active IPv4) adapter only, consistent with MAC/DHCP.
+- More robust antivirus state decoding (nibble masks) for third-party products.
+
+### Removed
+- Internal cleanup: dropped unused `DiskTotal`/`DiskFree` fields and a redundant disk query
+  (Storage is driven by the per-disk list); merged a duplicate accent brush.
+
 ## [1.3.0] - 2026-06-23
 
 ### Added
@@ -50,6 +60,7 @@ All notable changes to BgLight. Format inspired by
 - `/outputPath`, `/position`, `/bgColor`, `/fontSize`, `/fontName` options.
 - Deployment via scheduled task / GPO (`deploy/run-bglight.bat`).
 
+[1.3.1]: https://github.com/navanem/navanem_SysInfoTool/releases/tag/v1.3.1
 [1.3.0]: https://github.com/navanem/navanem_SysInfoTool/releases/tag/v1.3.0
 [1.2.1]: https://github.com/navanem/navanem_SysInfoTool/releases/tag/v1.2.1
 [1.1.0]: https://github.com/navanem/navanem_SysInfoTool/releases/tag/v1.1.0
