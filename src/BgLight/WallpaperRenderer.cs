@@ -15,7 +15,7 @@ namespace BgLight
 
         public static void Render(SystemInfoData data, AppConfig config, int width, int height)
         {
-            var lines = data.ToLines();
+            var rows = data.Rows();
 
             using (var bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb))
             using (var graphics = Graphics.FromImage(bitmap))
@@ -26,10 +26,14 @@ namespace BgLight
                 graphics.Clear(config.BgColor);
                 graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
-                // Mesure du bloc de texte
+                // Mesure du bloc de texte (2 colonnes : label et value)
                 float lineHeight = font.GetHeight(graphics) + LineSpacing;
-                float textWidth = MeasureMaxWidth(graphics, lines, font);
-                float textHeight = lineHeight * lines.Count;
+                var labelValueSizes = MeasureColumns(graphics, rows, font);
+                float labelWidth = labelValueSizes.Item1;
+                float valueWidth = labelValueSizes.Item2;
+                float columnGap = 20f; // espace entre colonnes
+                float textWidth = labelWidth + columnGap + valueWidth;
+                float textHeight = lineHeight * rows.Count;
 
                 float panelWidth = textWidth + PanelPadding * 2;
                 float panelHeight = textHeight + PanelPadding * 2;
@@ -40,9 +44,10 @@ namespace BgLight
 
                 float x = panelOrigin.X + PanelPadding;
                 float y = panelOrigin.Y + PanelPadding;
-                foreach (var line in lines)
+                foreach (var row in rows)
                 {
-                    graphics.DrawString(line, font, textBrush, x, y);
+                    graphics.DrawString(row.Label + ":", font, textBrush, x, y);
+                    graphics.DrawString(row.Value, font, textBrush, x + labelWidth + columnGap, y);
                     y += lineHeight;
                 }
 
@@ -56,15 +61,18 @@ namespace BgLight
             }
         }
 
-        private static float MeasureMaxWidth(Graphics graphics, IList<string> lines, Font font)
+        private static (float, float) MeasureColumns(Graphics graphics, IList<(string Label, string Value)> rows, Font font)
         {
-            float max = 1f;
-            foreach (var line in lines)
+            float maxLabelWidth = 1f;
+            float maxValueWidth = 1f;
+            foreach (var row in rows)
             {
-                var size = graphics.MeasureString(string.IsNullOrEmpty(line) ? " " : line, font);
-                if (size.Width > max) max = size.Width;
+                var labelSize = graphics.MeasureString(row.Label + ":", font);
+                var valueSize = graphics.MeasureString(row.Value, font);
+                if (labelSize.Width > maxLabelWidth) maxLabelWidth = labelSize.Width;
+                if (valueSize.Width > maxValueWidth) maxValueWidth = valueSize.Width;
             }
-            return max;
+            return (maxLabelWidth, maxValueWidth);
         }
 
         private static PointF PanelOrigin(PanelPosition pos, int width, int height, float pw, float ph)
