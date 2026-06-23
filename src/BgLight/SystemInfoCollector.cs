@@ -132,6 +132,44 @@ namespace BgLight
             }
             catch { }
 
+            // Win32_Processor : nom du processeur (premier CPU)
+            try
+            {
+                using (var searcher = new ManagementObjectSearcher("SELECT Name FROM Win32_Processor"))
+                using (var results = searcher.Get())
+                {
+                    foreach (ManagementObject mo in results)
+                    {
+                        using (mo)
+                        {
+                            var name = (mo["Name"] as string ?? "").Trim();
+                            if (!string.IsNullOrWhiteSpace(name)) data.Cpu = name;
+                        }
+                        break;
+                    }
+                }
+            }
+            catch { }
+
+            // Win32_BIOS : numero de serie du poste
+            try
+            {
+                using (var searcher = new ManagementObjectSearcher("SELECT SerialNumber FROM Win32_BIOS"))
+                using (var results = searcher.Get())
+                {
+                    foreach (ManagementObject mo in results)
+                    {
+                        using (mo)
+                        {
+                            var serial = (mo["SerialNumber"] as string ?? "").Trim();
+                            if (!string.IsNullOrWhiteSpace(serial)) data.SerialNumber = serial;
+                        }
+                        break;
+                    }
+                }
+            }
+            catch { }
+
             return data;
         }
     }

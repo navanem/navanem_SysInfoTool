@@ -34,5 +34,13 @@ namespace BgLight.Tests
             Assert.NotEqual("N/A", data.User);
             Assert.Contains("\\", data.User);
         }
+
+        [Fact]
+        public void Cpu_and_serial_are_never_null()
+        {
+            var data = SystemInfoCollector.Collect();
+            Assert.False(string.IsNullOrEmpty(data.Cpu));
+            Assert.False(string.IsNullOrEmpty(data.SerialNumber));
+        }
     }
 }
