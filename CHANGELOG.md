@@ -4,7 +4,13 @@ All notable changes to BgLight. Format inspired by
 [Keep a Changelog](https://keepachangelog.com/), versions follow
 [SemVer](https://semver.org/).
 
-## [1.2.0] - 2026-06-23
+## [1.2.1] - 2026-06-23
+
+### Changed
+- Full **English** documentation (README, CHANGELOG, deployment script) and source code
+  comments; the error log message is now in English.
+
+## 1.2.0 - 2026-06-23
 
 ### Changed
 - Panel labels and units are now in **English** (`User`, `Processor`, `Serial No.`,
@@ -33,5 +39,5 @@ All notable changes to BgLight. Format inspired by
 - `/outputPath`, `/position`, `/bgColor`, `/fontSize`, `/fontName` options.
 - Deployment via scheduled task / GPO (`deploy/run-bglight.bat`).
 
-[1.2.0]: https://github.com/navanem/navanem_SysInfoTool/releases/tag/v1.2.0
+[1.2.1]: https://github.com/navanem/navanem_SysInfoTool/releases/tag/v1.2.1
 [1.1.0]: https://github.com/navanem/navanem_SysInfoTool/releases/tag/v1.1.0
