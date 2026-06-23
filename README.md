@@ -37,6 +37,11 @@ by default on Windows 10/11).
   configurable (`/accentColor`, default blue `#0078D4`).
 - **Two aligned columns** (label / value) for clean readability.
 - **Panel footer**: `made by navanem.com` + version number.
+- **Grouped sections** (System / Hardware / Network / Storage / Security).
+- **Optional background image** (`/bgImage`) — the panel is drawn over it; falls back to the solid color.
+- **Multi-monitor**: one panel per monitor across the whole virtual desktop.
+- **DPI-aware** (PerMonitorV2) with pixel-accurate Span wallpaper.
+- Panel **drop shadow + border**.
 - **Robust**: every information source is isolated; if a query fails, the value shows
   `N/A` instead of crashing the tool.
 - **Lightweight and non-resident**: no service, no background process; the exe exits as
@@ -44,20 +49,16 @@ by default on Windows 10/11).
 
 ## Displayed information
 
-| Field | Source |
+| Section | Fields |
 |---|---|
-| Computer name (title) | `Win32_ComputerSystem` / `Environment.MachineName` |
-| **User** | Windows session (`DOMAIN\user`) |
-| **Processor** | `Win32_Processor.Name` |
-| **Serial No.** | `Win32_BIOS.SerialNumber` |
-| **IPv4** | active network interfaces (excluding loopback) |
-| **OS** | `Win32_OperatingSystem` (edition + build) |
-| **RAM** | used / total (`Win32_ComputerSystem` + `Win32_OperatingSystem`) |
-| **Disk (C:)** | free / total (`Win32_LogicalDisk`) |
-| **Domain** | domain or workgroup |
-| **Generated** | generation date/time |
+| **System** | User · OS · Uptime · Battery (laptops) · Generated |
+| **Hardware** | Manufacturer · Model · Processor · Serial No. · Asset tag · RAM |
+| **Network** | Domain · FQDN · IPv4 · MAC · DHCP · DNS |
+| **Storage** | Free / total for every fixed disk |
+| **Security** | BitLocker · Windows activation · Antivirus |
 
-Sizes are shown in **GB** (gibibytes, base 1024).
+Sizes are shown in **GB** (gibibytes, base 1024). Security fields require elevation and
+otherwise show `N/A`.
 
 ## Requirements
 
@@ -95,6 +96,7 @@ the default is kept.
 | Argument | Default | Description |
 |---|---|---|
 | `/outputPath` | `C:\ProgramData\BgLight\wallpaper_info.bmp` | Path of the generated BMP (and of `log.txt`) |
+| `/bgImage` | (none) | Background image drawn full-screen behind the panel; falls back to `/bgColor` |
 | `/position` | `TopRight` | `TopLeft`, `TopRight`, `BottomLeft`, `BottomRight` |
 | `/accentColor` | `#0078D4` | Accent line color (hex `#RRGGBB`) |
 | `/bgColor` | `#202020` | Solid background color (hex) |
