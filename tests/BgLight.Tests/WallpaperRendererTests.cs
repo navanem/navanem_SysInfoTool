@@ -73,5 +73,35 @@ namespace BgLight.Tests
                 }
             }
         }
+
+        [Fact]
+        public void Render_with_full_data_creates_bmp()
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "BgLightTest_" + Guid.NewGuid().ToString("N"));
+            var path = Path.Combine(dir, "wp.bmp");
+            try
+            {
+                var data = new SystemInfoData
+                {
+                    ComputerName = "DESKTOP-AV12",
+                    User = "CORP\\jdupont",
+                    Cpu = "Intel Core i7-1185G7",
+                    SerialNumber = "5CD1234XYZ",
+                    IPv4 = "10.0.2.47"
+                };
+                WallpaperRenderer.Render(data, ConfigWithOutput(path), 1920, 1080);
+
+                Assert.True(File.Exists(path));
+                using (var img = Image.FromFile(path))
+                {
+                    Assert.Equal(1920, img.Width);
+                    Assert.Equal(1080, img.Height);
+                }
+            }
+            finally
+            {
+                if (Directory.Exists(dir)) Directory.Delete(dir, true);
+            }
+        }
     }
 }

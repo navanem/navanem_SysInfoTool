@@ -6,6 +6,8 @@ namespace BgLight
     {
         public string ComputerName { get; set; } = "N/A";
         public string User { get; set; } = "N/A";
+        public string Cpu { get; set; } = "N/A";
+        public string SerialNumber { get; set; } = "N/A";
         public string IPv4 { get; set; } = "N/A";
         public string OsVersion { get; set; } = "N/A";
         public string RamTotal { get; set; } = "N/A";
@@ -15,19 +17,24 @@ namespace BgLight
         public string DomainOrWorkgroup { get; set; } = "N/A";
         public string GeneratedAt { get; set; } = "N/A";
 
-        public IList<string> ToLines()
+        public string Title
         {
-            return new List<string>
+            get { return ComputerName; }
+        }
+
+        public IList<(string Label, string Value)> Rows()
+        {
+            return new List<(string Label, string Value)>
             {
-                "PC          : " + ComputerName,
-                "Utilisateur : " + User,
-                "IPv4        : " + IPv4,
-                "OS          : " + OsVersion,
-                "RAM         : " + RamUsed + " / " + RamTotal,
-                "Disque (C:)  : " + DiskFree + " libre / " + DiskTotal,
-                "Domaine     : " + DomainOrWorkgroup,
-                "Genere le   : " + GeneratedAt,
-                "" // ligne de respiration en bas du panneau
+                ("Utilisateur", User),
+                ("Processeur", Cpu),
+                ("N° série", SerialNumber),
+                ("IPv4", IPv4),
+                ("OS", OsVersion),
+                ("RAM", RamUsed + " / " + RamTotal),
+                ("Disque (C:)", DiskFree + " libre / " + DiskTotal),
+                ("Domaine", DomainOrWorkgroup),
+                ("Généré le", GeneratedAt)
             };
         }
     }
