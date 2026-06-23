@@ -19,12 +19,12 @@ namespace BgLight
             // SystemParametersInfo requires an absolute path.
             imagePath = System.IO.Path.GetFullPath(imagePath);
 
-            // "Fill" style
+            // "Span" style: the single bitmap maps 1:1 across the whole virtual desktop.
             using (var key = Registry.CurrentUser.CreateSubKey(@"Control Panel\Desktop"))
             {
                 if (key != null)
                 {
-                    key.SetValue("WallpaperStyle", "10"); // 10 = Fill
+                    key.SetValue("WallpaperStyle", "22"); // 22 = Span
                     key.SetValue("TileWallpaper", "0");
                 }
             }
