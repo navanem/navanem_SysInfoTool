@@ -104,30 +104,12 @@ namespace BgLight
             }
             catch { }
 
-            // Win32_LogicalDisk WHERE DeviceID = 'C:'
-            try
-            {
-                using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_LogicalDisk WHERE DeviceID = 'C:'"))
-                using (var results = searcher.Get())
-                {
-                    foreach (ManagementObject mo in results)
-                    {
-                        using (mo)
-                        {
-                            try { data.DiskTotal = Format.Giga(Convert.ToUInt64(mo["Size"])); } catch { }
-                            try { data.DiskFree = Format.Giga(Convert.ToUInt64(mo["FreeSpace"])); } catch { }
-                        }
-                        break;
-                    }
-                }
-            }
-            catch { }
-
-            // Network: IPv4, MAC, DHCP, DNS (first active non-loopback IPv4 adapter)
+            // Network: IPv4 from all active adapters; MAC, DHCP, DNS from the first active
+            // non-loopback IPv4 adapter (the primary one).
             try
             {
                 var ips = new List<string>();
-                var dnsList = new List<string>();
+                bool primaryCaptured = false;
                 foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
                 {
                     if (ni.OperationalStatus != OperationalStatus.Up) continue;
@@ -144,29 +126,31 @@ namespace BgLight
                             hasIpv4 = true;
                         }
                     }
-                    if (!hasIpv4) continue;
+                    if (!hasIpv4 || primaryCaptured) continue;
 
-                    if (data.Mac == "N/A")
+                    // First IPv4 adapter wins for MAC / DHCP / DNS.
+                    primaryCaptured = true;
+
+                    var phys = ni.GetPhysicalAddress().GetAddressBytes();
+                    if (phys != null && phys.Length > 0)
                     {
-                        var phys = ni.GetPhysicalAddress().GetAddressBytes();
-                        if (phys != null && phys.Length > 0)
-                        {
-                            data.Mac = string.Join(":", phys.Select(b => b.ToString("X2")));
-                        }
+                        data.Mac = string.Join(":", phys.Select(b => b.ToString("X2")));
                     }
 
                     try
                     {
                         foreach (var dh in ipProps.DhcpServerAddresses)
                         {
-                            if (dh.AddressFamily == AddressFamily.InterNetwork && data.Dhcp == "N/A")
+                            if (dh.AddressFamily == AddressFamily.InterNetwork)
                             {
                                 data.Dhcp = dh.ToString();
+                                break;
                             }
                         }
                     }
                     catch { }
 
+                    var dnsList = new List<string>();
                     foreach (var dns in ipProps.DnsAddresses)
                     {
                         if (dns.AddressFamily == AddressFamily.InterNetwork)
@@ -174,9 +158,9 @@ namespace BgLight
                             dnsList.Add(dns.ToString());
                         }
                     }
+                    if (dnsList.Count > 0) data.Dns = Format.Join(dnsList.Distinct());
                 }
                 data.IPv4 = Format.Join(ips.Distinct());
-                if (dnsList.Count > 0) data.Dns = Format.Join(dnsList.Distinct());
             }
             catch { }
 
@@ -362,8 +346,10 @@ namespace BgLight
                             var name = (mo["displayName"] as string ?? "").Trim();
                             int state = 0;
                             try { state = Convert.ToInt32(mo["productState"]); } catch { }
-                            bool enabled = (state & 0x1000) != 0;
-                            bool upToDate = (state & 0x10) == 0;
+                            // productState packs status in nibbles: bits 12-15 = scanner (non-zero = enabled),
+                            // bits 4-7 = definitions (non-zero = out of date).
+                            bool enabled = (state & 0xF000) != 0;
+                            bool upToDate = (state & 0xF0) == 0;
                             if (!string.IsNullOrWhiteSpace(name))
                             {
                                 data.Antivirus = name + " (" + (enabled ? "enabled" : "disabled")

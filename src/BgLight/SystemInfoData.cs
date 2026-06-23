@@ -16,8 +16,6 @@ namespace BgLight
         public string Uptime { get; set; } = "N/A";
         public string RamTotal { get; set; } = "N/A";
         public string RamUsed { get; set; } = "N/A";
-        public string DiskTotal { get; set; } = "N/A";
-        public string DiskFree { get; set; } = "N/A";
         public string DomainOrWorkgroup { get; set; } = "N/A";
         public string Fqdn { get; set; } = "N/A";
         public string Mac { get; set; } = "N/A";
@@ -29,7 +27,7 @@ namespace BgLight
         public string Battery { get; set; } = "";
         public string GeneratedAt { get; set; } = "N/A";
 
-        public IList<(string Label, string Value)> Disks { get; } = new List<(string, string)>();
+        public IList<(string Label, string Value)> Disks { get; } = new List<(string Label, string Value)>();
 
         public string Title
         {
