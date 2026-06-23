@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -97,6 +98,75 @@ namespace BgLight.Tests
                     Assert.Equal(1920, img.Width);
                     Assert.Equal(1080, img.Height);
                 }
+            }
+            finally
+            {
+                if (Directory.Exists(dir)) Directory.Delete(dir, true);
+            }
+        }
+
+        [Fact]
+        public void Render_multi_monitor_creates_virtual_size_bmp()
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "BgLightTest_" + Guid.NewGuid().ToString("N"));
+            var path = Path.Combine(dir, "wp.bmp");
+            try
+            {
+                var vbounds = new Rectangle(0, 0, 3840, 1080);
+                var monitors = new System.Collections.Generic.List<Rectangle>
+                {
+                    new Rectangle(0, 0, 1920, 1080),
+                    new Rectangle(1920, 0, 1920, 1080)
+                };
+                WallpaperRenderer.Render(new SystemInfoData { ComputerName = "PC01" },
+                    ConfigWithOutput(path), vbounds, monitors);
+
+                Assert.True(File.Exists(path));
+                using (var img = Image.FromFile(path))
+                {
+                    Assert.Equal(3840, img.Width);
+                    Assert.Equal(1080, img.Height);
+                }
+            }
+            finally
+            {
+                if (Directory.Exists(dir)) Directory.Delete(dir, true);
+            }
+        }
+
+        [Fact]
+        public void Render_with_missing_bgImage_falls_back_to_solid()
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "BgLightTest_" + Guid.NewGuid().ToString("N"));
+            var path = Path.Combine(dir, "wp.bmp");
+            try
+            {
+                var config = AppConfig.Parse(new[] { "/outputPath=" + path, @"/bgImage=C:\does\not\exist.png" });
+                WallpaperRenderer.Render(new SystemInfoData { ComputerName = "PC01" }, config, 800, 600);
+                Assert.True(File.Exists(path));
+            }
+            finally
+            {
+                if (Directory.Exists(dir)) Directory.Delete(dir, true);
+            }
+        }
+
+        [Fact]
+        public void Render_with_present_bgImage()
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "BgLightTest_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(dir);
+            var imgPath = Path.Combine(dir, "bg.png");
+            using (var bg = new Bitmap(100, 100))
+            {
+                bg.Save(imgPath, ImageFormat.Png);
+            }
+            var path = Path.Combine(dir, "wp.bmp");
+            try
+            {
+                var config = AppConfig.Parse(new[] { "/outputPath=" + path, "/bgImage=" + imgPath });
+                WallpaperRenderer.Render(new SystemInfoData { ComputerName = "PC01" }, config, 800, 600);
+                Assert.True(File.Exists(path));
             }
             finally
             {
