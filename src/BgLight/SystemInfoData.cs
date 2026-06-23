@@ -26,15 +26,15 @@ namespace BgLight
         {
             return new List<(string Label, string Value)>
             {
-                ("Utilisateur", User),
-                ("Processeur", Cpu),
-                ("N° série", SerialNumber),
+                ("User", User),
+                ("Processor", Cpu),
+                ("Serial No.", SerialNumber),
                 ("IPv4", IPv4),
                 ("OS", OsVersion),
                 ("RAM", RamUsed + " / " + RamTotal),
-                ("Disque (C:)", DiskFree + " libre / " + DiskTotal),
-                ("Domaine", DomainOrWorkgroup),
-                ("Généré le", GeneratedAt)
+                ("Disk (C:)", DiskFree + " free / " + DiskTotal),
+                ("Domain", DomainOrWorkgroup),
+                ("Generated", GeneratedAt)
             };
         }
     }

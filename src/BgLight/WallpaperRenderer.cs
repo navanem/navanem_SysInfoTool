@@ -18,6 +18,9 @@ namespace BgLight
         private const int AccentHeight = 3;     // épaisseur du trait d'accent
         private const int AccentGap = 14;    // espace sous le trait (avant le corps)
         private const int ColumnGap = 28;    // espace entre colonne label et colonne valeur
+        private const int FooterGap = 14;    // espace au-dessus du pied de panneau
+
+        private const string FooterCredit = "made by navanem.com";
 
         public static void Render(SystemInfoData data, AppConfig config, int width, int height)
         {
@@ -27,9 +30,11 @@ namespace BgLight
             using (var graphics = Graphics.FromImage(bitmap))
             using (var titleFont = new Font(config.FontName, config.FontSize + 3f, FontStyle.Bold, GraphicsUnit.Point))
             using (var font = new Font(config.FontName, config.FontSize, FontStyle.Regular, GraphicsUnit.Point))
+            using (var footerFont = new Font(config.FontName, Math.Max(7f, config.FontSize - 2f), FontStyle.Regular, GraphicsUnit.Point))
             using (var textBrush = new SolidBrush(Color.FromArgb(240, 240, 240)))
             using (var labelBrush = new SolidBrush(Color.FromArgb(170, 170, 170)))
-            using (var panelBrush = new SolidBrush(Color.FromArgb(140, 0, 0, 0)))
+            using (var footerBrush = new SolidBrush(Color.FromArgb(140, 140, 140)))
+            using (var panelBrush = new SolidBrush(Color.FromArgb(100, 0, 0, 0)))
             using (var accentBrush = new SolidBrush(config.AccentColor))
             {
                 graphics.Clear(config.BgColor);
@@ -52,9 +57,15 @@ namespace BgLight
                 string title = string.IsNullOrEmpty(data.Title) ? " " : data.Title;
                 float titleWidth = graphics.MeasureString(title, titleFont).Width;
                 float bodyWidth = labelColWidth + ColumnGap + valueColWidth;
-                float contentWidth = Math.Max(titleWidth, bodyWidth);
 
-                float contentHeight = titleHeight + TitleGap + AccentHeight + AccentGap + lineHeight * rows.Count;
+                string footer = BuildFooter();
+                float footerHeight = footerFont.GetHeight(graphics);
+                float footerWidth = graphics.MeasureString(footer, footerFont).Width;
+
+                float contentWidth = Math.Max(Math.Max(titleWidth, bodyWidth), footerWidth);
+
+                float contentHeight = titleHeight + TitleGap + AccentHeight + AccentGap
+                    + lineHeight * rows.Count + FooterGap + footerHeight;
 
                 float panelWidth = contentWidth + PanelPadding * 2;
                 float panelHeight = contentHeight + PanelPadding * 2;
@@ -89,6 +100,10 @@ namespace BgLight
                     y += lineHeight;
                 }
 
+                // Pied de panneau : credit + version
+                y += FooterGap;
+                graphics.DrawString(footer, footerFont, footerBrush, x, y);
+
                 var dir = Path.GetDirectoryName(config.OutputPath);
                 if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 {
@@ -97,6 +112,16 @@ namespace BgLight
 
                 bitmap.Save(config.OutputPath, ImageFormat.Bmp);
             }
+        }
+
+        private static string BuildFooter()
+        {
+            var v = typeof(WallpaperRenderer).Assembly.GetName().Version;
+            if (v == null)
+            {
+                return FooterCredit;
+            }
+            return FooterCredit + "   ·   v" + v.Major + "." + v.Minor + "." + v.Build;
         }
 
         private static GraphicsPath RoundedRect(float x, float y, float w, float h, float radius)
