@@ -14,6 +14,7 @@ namespace BgLight
         public Color BgColor { get; private set; } = ColorTranslator.FromHtml("#202020");
         public string FontName { get; private set; } = "Segoe UI";
         public Color AccentColor { get; private set; } = ColorTranslator.FromHtml("#0078D4");
+        public string BgImage { get; private set; } = "";
 
         public string LogPath
         {
@@ -105,6 +106,11 @@ namespace BgLight
                 {
                     // keep default
                 }
+            }
+
+            if (map.TryGetValue("bgImage", out s) && !string.IsNullOrWhiteSpace(s))
+            {
+                config.BgImage = s;
             }
 
             return config;
