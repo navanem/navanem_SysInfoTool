@@ -8,7 +8,7 @@ by default on Windows 10/11).
 
 ![BgLight panel preview](docs/screenshot.png)
 
-> Preview generated with placeholder data. On a real machine the values come from the
+> Preview rendered with placeholder data. On a real machine the values come from the
 > system (WMI + .NET APIs).
 
 ---
