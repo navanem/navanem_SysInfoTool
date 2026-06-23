@@ -42,5 +42,24 @@ namespace BgLight.Tests
             Assert.False(string.IsNullOrEmpty(data.Cpu));
             Assert.False(string.IsNullOrEmpty(data.SerialNumber));
         }
+
+        [Fact]
+        public void New_fields_are_never_null()
+        {
+            var d = SystemInfoCollector.Collect();
+            Assert.NotNull(d.Manufacturer);
+            Assert.NotNull(d.Model);
+            Assert.NotNull(d.AssetTag);
+            Assert.NotNull(d.Uptime);
+            Assert.NotNull(d.Mac);
+            Assert.NotNull(d.Fqdn);
+            Assert.NotNull(d.Dhcp);
+            Assert.NotNull(d.Dns);
+            Assert.NotNull(d.BitLocker);
+            Assert.NotNull(d.Activation);
+            Assert.NotNull(d.Antivirus);
+            Assert.NotNull(d.Battery);
+            Assert.NotNull(d.Disks);
+        }
     }
 }

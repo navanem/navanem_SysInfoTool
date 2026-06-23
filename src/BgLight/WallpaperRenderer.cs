@@ -10,99 +10,139 @@ namespace BgLight
 {
     public static class WallpaperRenderer
     {
-        private const int PanelMargin = 40;    // distance panel <-> screen edge
-        private const int PanelPadding = 24;    // distance content <-> panel edge
-        private const int LineSpacing = 8;     // vertical spacing between body lines
-        private const int CornerRadius = 12;    // radius of panel rounded corners
-        private const int TitleGap = 10;    // space below title (before line)
-        private const int AccentHeight = 3;     // accent line thickness
-        private const int AccentGap = 14;    // space below line (before body)
-        private const int ColumnGap = 28;    // space between label and value columns
-        private const int FooterGap = 14;    // space above panel footer
+        private const int PanelMargin = 40;
+        private const int PanelPadding = 24;
+        private const int LineSpacing = 7;
+        private const int CornerRadius = 14;
+        private const int TitleGap = 10;
+        private const int AccentHeight = 3;
+        private const int AccentGap = 14;
+        private const int ColumnGap = 28;
+        private const int SectionTitleGap = 4;
+        private const int SectionGap = 12;
+        private const int FooterGap = 14;
+        private const int ShadowOffset = 6;
 
         private const string FooterCredit = "made by navanem.com";
 
         public static void Render(SystemInfoData data, AppConfig config, int width, int height)
         {
-            var rows = data.Rows();
+            Render(data, config, new Rectangle(0, 0, width, height),
+                new List<Rectangle> { new Rectangle(0, 0, width, height) });
+        }
 
-            using (var bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb))
+        public static void Render(SystemInfoData data, AppConfig config, Rectangle virtualBounds, IList<Rectangle> monitors)
+        {
+            int w = Math.Max(1, virtualBounds.Width);
+            int h = Math.Max(1, virtualBounds.Height);
+
+            using (var bitmap = new Bitmap(w, h, PixelFormat.Format24bppRgb))
             using (var graphics = Graphics.FromImage(bitmap))
             using (var titleFont = new Font(config.FontName, config.FontSize + 3f, FontStyle.Bold, GraphicsUnit.Point))
+            using (var sectionFont = new Font(config.FontName, Math.Max(7f, config.FontSize - 1f), FontStyle.Bold, GraphicsUnit.Point))
             using (var font = new Font(config.FontName, config.FontSize, FontStyle.Regular, GraphicsUnit.Point))
             using (var footerFont = new Font(config.FontName, Math.Max(7f, config.FontSize - 2f), FontStyle.Regular, GraphicsUnit.Point))
             using (var textBrush = new SolidBrush(Color.FromArgb(240, 240, 240)))
             using (var labelBrush = new SolidBrush(Color.FromArgb(170, 170, 170)))
+            using (var sectionBrush = new SolidBrush(config.AccentColor))
             using (var footerBrush = new SolidBrush(Color.FromArgb(140, 140, 140)))
-            using (var panelBrush = new SolidBrush(Color.FromArgb(100, 0, 0, 0)))
+            using (var panelBrush = new SolidBrush(Color.FromArgb(120, 0, 0, 0)))
+            using (var shadowBrush = new SolidBrush(Color.FromArgb(90, 0, 0, 0)))
+            using (var borderPen = new Pen(Color.FromArgb(60, 255, 255, 255), 1f))
             using (var accentBrush = new SolidBrush(config.AccentColor))
             {
-                graphics.Clear(config.BgColor);
+                DrawBackground(graphics, config, w, h);
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
+                var sections = data.Sections();
+
                 float lineHeight = font.GetHeight(graphics) + LineSpacing;
                 float titleHeight = titleFont.GetHeight(graphics);
+                float sectionHeight = sectionFont.GetHeight(graphics);
+                float footerHeight = footerFont.GetHeight(graphics);
 
-                float labelColWidth = 1f;
-                float valueColWidth = 1f;
-                foreach (var r in rows)
+                float labelColWidth = 1f, valueColWidth = 1f, sectionTitleWidth = 1f;
+                foreach (var s in sections)
                 {
-                    float lw = graphics.MeasureString(string.IsNullOrEmpty(r.Label) ? " " : r.Label, font).Width;
-                    if (lw > labelColWidth) labelColWidth = lw;
-                    float vw = graphics.MeasureString(string.IsNullOrEmpty(r.Value) ? " " : r.Value, font).Width;
-                    if (vw > valueColWidth) valueColWidth = vw;
+                    float sw = graphics.MeasureString(s.Title, sectionFont).Width;
+                    if (sw > sectionTitleWidth) sectionTitleWidth = sw;
+                    foreach (var r in s.Rows)
+                    {
+                        float lw = graphics.MeasureString(string.IsNullOrEmpty(r.Label) ? " " : r.Label, font).Width;
+                        if (lw > labelColWidth) labelColWidth = lw;
+                        float vw = graphics.MeasureString(string.IsNullOrEmpty(r.Value) ? " " : r.Value, font).Width;
+                        if (vw > valueColWidth) valueColWidth = vw;
+                    }
                 }
 
                 string title = string.IsNullOrEmpty(data.Title) ? " " : data.Title;
                 float titleWidth = graphics.MeasureString(title, titleFont).Width;
+                string footer = BuildFooter();
+                float footerWidth = graphics.MeasureString(footer, footerFont).Width;
                 float bodyWidth = labelColWidth + ColumnGap + valueColWidth;
 
-                string footer = BuildFooter();
-                float footerHeight = footerFont.GetHeight(graphics);
-                float footerWidth = graphics.MeasureString(footer, footerFont).Width;
+                float contentWidth = Math.Max(Math.Max(titleWidth, bodyWidth), Math.Max(footerWidth, sectionTitleWidth));
 
-                float contentWidth = Math.Max(Math.Max(titleWidth, bodyWidth), footerWidth);
-
-                float contentHeight = titleHeight + TitleGap + AccentHeight + AccentGap
-                    + lineHeight * rows.Count + FooterGap + footerHeight;
+                float contentHeight = titleHeight + TitleGap + AccentHeight + AccentGap;
+                for (int i = 0; i < sections.Count; i++)
+                {
+                    contentHeight += sectionHeight + SectionTitleGap + lineHeight * sections[i].Rows.Count;
+                    if (i < sections.Count - 1) contentHeight += SectionGap;
+                }
+                contentHeight += FooterGap + footerHeight;
 
                 float panelWidth = contentWidth + PanelPadding * 2;
                 float panelHeight = contentHeight + PanelPadding * 2;
+                float valueX = labelColWidth + ColumnGap;
 
-                PointF panelOrigin = PanelOrigin(config.Position, width, height, panelWidth, panelHeight);
-
-                using (var path = RoundedRect(panelOrigin.X, panelOrigin.Y, panelWidth, panelHeight, CornerRadius))
+                void DrawPanelAt(float ox, float oy)
                 {
-                    graphics.FillPath(panelBrush, path);
+                    using (var shadowPath = RoundedRect(ox + ShadowOffset, oy + ShadowOffset, panelWidth, panelHeight, CornerRadius))
+                    {
+                        graphics.FillPath(shadowBrush, shadowPath);
+                    }
+                    using (var path = RoundedRect(ox, oy, panelWidth, panelHeight, CornerRadius))
+                    {
+                        graphics.FillPath(panelBrush, path);
+                        graphics.DrawPath(borderPen, path);
+                    }
+
+                    float x = ox + PanelPadding;
+                    float y = oy + PanelPadding;
+
+                    graphics.DrawString(title, titleFont, textBrush, x, y);
+                    y += titleHeight + TitleGap;
+
+                    using (var accentPath = RoundedRect(x, y, contentWidth, AccentHeight, AccentHeight / 2f))
+                    {
+                        graphics.FillPath(accentBrush, accentPath);
+                    }
+                    y += AccentHeight + AccentGap;
+
+                    for (int i = 0; i < sections.Count; i++)
+                    {
+                        graphics.DrawString(sections[i].Title, sectionFont, sectionBrush, x, y);
+                        y += sectionHeight + SectionTitleGap;
+                        foreach (var r in sections[i].Rows)
+                        {
+                            graphics.DrawString(r.Label, font, labelBrush, x, y);
+                            graphics.DrawString(r.Value, font, textBrush, x + valueX, y);
+                            y += lineHeight;
+                        }
+                        if (i < sections.Count - 1) y += SectionGap;
+                    }
+
+                    y += FooterGap;
+                    graphics.DrawString(footer, footerFont, footerBrush, x, y);
                 }
 
-                float x = panelOrigin.X + PanelPadding;
-                float y = panelOrigin.Y + PanelPadding;
-
-                // Title (PC name)
-                graphics.DrawString(title, titleFont, textBrush, x, y);
-                y += titleHeight + TitleGap;
-
-                // Accent line below title
-                using (var accentPath = RoundedRect(x, y, contentWidth, AccentHeight, AccentHeight / 2f))
+                foreach (var m in monitors)
                 {
-                    graphics.FillPath(accentBrush, accentPath);
+                    var rect = new Rectangle(m.X - virtualBounds.X, m.Y - virtualBounds.Y, m.Width, m.Height);
+                    PointF origin = PanelOrigin(config.Position, rect, panelWidth, panelHeight);
+                    DrawPanelAt(origin.X, origin.Y);
                 }
-                y += AccentHeight + AccentGap;
-
-                // Body: two aligned columns
-                float valueX = x + labelColWidth + ColumnGap;
-                foreach (var r in rows)
-                {
-                    graphics.DrawString(r.Label, font, labelBrush, x, y);
-                    graphics.DrawString(r.Value, font, textBrush, valueX, y);
-                    y += lineHeight;
-                }
-
-                // Panel footer: credit + version
-                y += FooterGap;
-                graphics.DrawString(footer, footerFont, footerBrush, x, y);
 
                 var dir = Path.GetDirectoryName(config.OutputPath);
                 if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
@@ -112,6 +152,23 @@ namespace BgLight
 
                 bitmap.Save(config.OutputPath, ImageFormat.Bmp);
             }
+        }
+
+        private static void DrawBackground(Graphics graphics, AppConfig config, int w, int h)
+        {
+            if (!string.IsNullOrEmpty(config.BgImage) && File.Exists(config.BgImage))
+            {
+                try
+                {
+                    using (var img = Image.FromFile(config.BgImage))
+                    {
+                        graphics.DrawImage(img, new Rectangle(0, 0, w, h));
+                        return;
+                    }
+                }
+                catch { }
+            }
+            graphics.Clear(config.BgColor);
         }
 
         private static string BuildFooter()
@@ -143,28 +200,28 @@ namespace BgLight
             return path;
         }
 
-        private static PointF PanelOrigin(PanelPosition pos, int width, int height, float pw, float ph)
+        private static PointF PanelOrigin(PanelPosition pos, Rectangle area, float pw, float ph)
         {
             float x, y;
             switch (pos)
             {
                 case PanelPosition.TopRight:
-                    x = width - PanelMargin - pw; y = PanelMargin;
+                    x = area.Right - PanelMargin - pw; y = area.Top + PanelMargin;
                     break;
                 case PanelPosition.BottomLeft:
-                    x = PanelMargin; y = height - PanelMargin - ph;
+                    x = area.Left + PanelMargin; y = area.Bottom - PanelMargin - ph;
                     break;
                 case PanelPosition.BottomRight:
-                    x = width - PanelMargin - pw; y = height - PanelMargin - ph;
+                    x = area.Right - PanelMargin - pw; y = area.Bottom - PanelMargin - ph;
                     break;
                 case PanelPosition.TopLeft:
                 default:
-                    x = PanelMargin; y = PanelMargin;
+                    x = area.Left + PanelMargin; y = area.Top + PanelMargin;
                     break;
             }
 
-            // Never start off-screen (large font / small resolution).
-            return new PointF(Math.Max(0f, x), Math.Max(0f, y));
+            // Never start before the monitor's top-left edge.
+            return new PointF(Math.Max(area.Left, x), Math.Max(area.Top, y));
         }
     }
 }

@@ -37,5 +37,23 @@ namespace BgLight.Tests
         {
             Assert.Equal("10.0.0.1", Format.Join(new[] { "", "  ", "10.0.0.1" }));
         }
+
+        [Fact]
+        public void Uptime_with_days()
+        {
+            Assert.Equal("3d 04:12", Format.Uptime(new System.TimeSpan(3, 4, 12, 0)));
+        }
+
+        [Fact]
+        public void Uptime_without_days()
+        {
+            Assert.Equal("04:12", Format.Uptime(new System.TimeSpan(0, 4, 12, 0)));
+        }
+
+        [Fact]
+        public void Uptime_clamps_negative_to_zero()
+        {
+            Assert.Equal("00:00", Format.Uptime(System.TimeSpan.FromMinutes(-5)));
+        }
     }
 }

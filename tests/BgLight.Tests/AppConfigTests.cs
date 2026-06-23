@@ -16,6 +16,7 @@ namespace BgLight.Tests
             Assert.Equal(ColorTranslator.FromHtml("#0078D4"), c.AccentColor);
             Assert.Equal(ColorTranslator.FromHtml("#202020"), c.BgColor);
             Assert.Equal("Segoe UI", c.FontName);
+            Assert.Equal("", c.BgImage);
         }
 
         [Fact]
@@ -80,6 +81,13 @@ namespace BgLight.Tests
         {
             var c = AppConfig.Parse(new[] { "/accentColor=#FF8800" });
             Assert.Equal(ColorTranslator.FromHtml("#FF8800"), c.AccentColor);
+        }
+
+        [Fact]
+        public void Parses_bg_image()
+        {
+            var c = AppConfig.Parse(new[] { @"/bgImage=C:\img\wall.png" });
+            Assert.Equal(@"C:\img\wall.png", c.BgImage);
         }
     }
 }

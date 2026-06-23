@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace BgLight
@@ -15,14 +17,23 @@ namespace BgLight
             {
                 var data = SystemInfoCollector.Collect();
 
-                var bounds = Screen.PrimaryScreen != null
-                    ? Screen.PrimaryScreen.Bounds
-                    : new System.Drawing.Rectangle(0, 0, 1920, 1080);
+                var virtualBounds = SystemInformation.VirtualScreen;
+                if (virtualBounds.Width <= 0 || virtualBounds.Height <= 0)
+                {
+                    virtualBounds = new Rectangle(0, 0, 1920, 1080);
+                }
 
-                int width = bounds.Width > 0 ? bounds.Width : 1920;
-                int height = bounds.Height > 0 ? bounds.Height : 1080;
+                var monitors = new List<Rectangle>();
+                foreach (var screen in Screen.AllScreens)
+                {
+                    monitors.Add(screen.Bounds);
+                }
+                if (monitors.Count == 0)
+                {
+                    monitors.Add(virtualBounds);
+                }
 
-                WallpaperRenderer.Render(data, config, width, height);
+                WallpaperRenderer.Render(data, config, virtualBounds, monitors);
                 WallpaperSetter.Apply(config.OutputPath);
 
                 return 0;

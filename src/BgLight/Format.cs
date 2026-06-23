@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -17,6 +18,14 @@ namespace BgLight
             var list = values?.Where(v => !string.IsNullOrWhiteSpace(v)).ToList()
                        ?? new List<string>();
             return list.Count == 0 ? "N/A" : string.Join(", ", list);
+        }
+
+        public static string Uptime(TimeSpan span)
+        {
+            if (span < TimeSpan.Zero) span = TimeSpan.Zero;
+            string hm = span.Hours.ToString("00", CultureInfo.InvariantCulture)
+                + ":" + span.Minutes.ToString("00", CultureInfo.InvariantCulture);
+            return span.Days > 0 ? span.Days + "d " + hm : hm;
         }
     }
 }
