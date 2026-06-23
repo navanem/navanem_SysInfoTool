@@ -34,7 +34,7 @@ namespace BgLight
             }
             catch
             {
-                // la journalisation ne doit jamais bloquer l'application
+                // logging should never block the application
             }
         }
     }

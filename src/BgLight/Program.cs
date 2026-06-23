@@ -29,7 +29,7 @@ namespace BgLight
             }
             catch (Exception ex)
             {
-                logger.Error("Echec de la mise a jour du fond d'ecran.", ex);
+                logger.Error("Failed to update the wallpaper.", ex);
                 return 1;
             }
         }

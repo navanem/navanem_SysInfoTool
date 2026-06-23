@@ -10,15 +10,15 @@ namespace BgLight
 {
     public static class WallpaperRenderer
     {
-        private const int PanelMargin = 40;    // distance panneau <-> bord écran
-        private const int PanelPadding = 24;    // distance contenu <-> bord panneau
-        private const int LineSpacing = 8;     // espace vertical entre lignes du corps
-        private const int CornerRadius = 12;    // rayon des coins arrondis du panneau
-        private const int TitleGap = 10;    // espace sous le titre (avant le trait)
-        private const int AccentHeight = 3;     // épaisseur du trait d'accent
-        private const int AccentGap = 14;    // espace sous le trait (avant le corps)
-        private const int ColumnGap = 28;    // espace entre colonne label et colonne valeur
-        private const int FooterGap = 14;    // espace au-dessus du pied de panneau
+        private const int PanelMargin = 40;    // distance panel <-> screen edge
+        private const int PanelPadding = 24;    // distance content <-> panel edge
+        private const int LineSpacing = 8;     // vertical spacing between body lines
+        private const int CornerRadius = 12;    // radius of panel rounded corners
+        private const int TitleGap = 10;    // space below title (before line)
+        private const int AccentHeight = 3;     // accent line thickness
+        private const int AccentGap = 14;    // space below line (before body)
+        private const int ColumnGap = 28;    // space between label and value columns
+        private const int FooterGap = 14;    // space above panel footer
 
         private const string FooterCredit = "made by navanem.com";
 
@@ -80,18 +80,18 @@ namespace BgLight
                 float x = panelOrigin.X + PanelPadding;
                 float y = panelOrigin.Y + PanelPadding;
 
-                // Titre (nom du PC)
+                // Title (PC name)
                 graphics.DrawString(title, titleFont, textBrush, x, y);
                 y += titleHeight + TitleGap;
 
-                // Trait d'accent sous le titre
+                // Accent line below title
                 using (var accentPath = RoundedRect(x, y, contentWidth, AccentHeight, AccentHeight / 2f))
                 {
                     graphics.FillPath(accentBrush, accentPath);
                 }
                 y += AccentHeight + AccentGap;
 
-                // Corps : deux colonnes alignées
+                // Body: two aligned columns
                 float valueX = x + labelColWidth + ColumnGap;
                 foreach (var r in rows)
                 {
@@ -100,7 +100,7 @@ namespace BgLight
                     y += lineHeight;
                 }
 
-                // Pied de panneau : credit + version
+                // Panel footer: credit + version
                 y += FooterGap;
                 graphics.DrawString(footer, footerFont, footerBrush, x, y);
 
@@ -163,7 +163,7 @@ namespace BgLight
                     break;
             }
 
-            // Ne jamais démarrer hors écran (grande police / petite résolution).
+            // Never start off-screen (large font / small resolution).
             return new PointF(Math.Max(0f, x), Math.Max(0f, y));
         }
     }

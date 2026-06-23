@@ -86,7 +86,7 @@ namespace BgLight
                 }
                 catch
                 {
-                    // garde le défaut
+                    // keep default
                 }
             }
 
@@ -103,7 +103,7 @@ namespace BgLight
                 }
                 catch
                 {
-                    // garde le défaut
+                    // keep default
                 }
             }
 

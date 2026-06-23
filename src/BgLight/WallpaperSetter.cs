@@ -16,10 +16,10 @@ namespace BgLight
 
         public static void Apply(string imagePath)
         {
-            // SystemParametersInfo exige un chemin absolu.
+            // SystemParametersInfo requires an absolute path.
             imagePath = System.IO.Path.GetFullPath(imagePath);
 
-            // Style "Remplir" (Fill)
+            // "Fill" style
             using (var key = Registry.CurrentUser.CreateSubKey(@"Control Panel\Desktop"))
             {
                 if (key != null)
@@ -38,7 +38,7 @@ namespace BgLight
             if (result == 0)
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error(),
-                    "SystemParametersInfo(SPI_SETDESKWALLPAPER) a echoue.");
+                    "SystemParametersInfo(SPI_SETDESKWALLPAPER) failed.");
             }
         }
     }

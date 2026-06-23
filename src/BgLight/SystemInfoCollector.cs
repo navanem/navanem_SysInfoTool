@@ -14,7 +14,7 @@ namespace BgLight
         {
             var data = new SystemInfoData();
 
-            // Secours .NET garantis non vides
+            // .NET fallbacks guaranteed non-empty
             try { data.ComputerName = Environment.MachineName; } catch { }
             try { data.User = Environment.UserDomainName + "\\" + Environment.UserName; } catch { }
             try { data.GeneratedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); } catch { }
@@ -22,7 +22,7 @@ namespace BgLight
             ulong totalRamBytes = 0;
             ulong freeRamBytes = 0;
 
-            // Win32_ComputerSystem : nom, domaine/workgroup, RAM totale
+            // Win32_ComputerSystem: computer name, domain/workgroup, total RAM
             try
             {
                 using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem"))
@@ -53,7 +53,7 @@ namespace BgLight
             }
             catch { }
 
-            // Win32_OperatingSystem : OS + build, RAM libre
+            // Win32_OperatingSystem: OS + build, free RAM
             try
             {
                 using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem"))
@@ -69,7 +69,7 @@ namespace BgLight
                                 ? "N/A"
                                 : caption + (string.IsNullOrWhiteSpace(build) ? "" : " (build " + build + ")");
 
-                            // FreePhysicalMemory est en kilo-octets
+                            // FreePhysicalMemory is in kilobytes
                             try { freeRamBytes = Convert.ToUInt64(mo["FreePhysicalMemory"]) * 1024UL; } catch { }
                         }
                         break;
@@ -78,7 +78,7 @@ namespace BgLight
             }
             catch { }
 
-            // RAM totale / utilisée
+            // Total / used RAM
             try
             {
                 if (totalRamBytes > 0)
@@ -132,7 +132,7 @@ namespace BgLight
             }
             catch { }
 
-            // Win32_Processor : nom du processeur (premier CPU)
+            // Win32_Processor: processor name (first CPU)
             try
             {
                 using (var searcher = new ManagementObjectSearcher("SELECT Name FROM Win32_Processor"))
@@ -151,7 +151,7 @@ namespace BgLight
             }
             catch { }
 
-            // Win32_BIOS : numero de serie du poste
+            // Win32_BIOS: computer serial number
             try
             {
                 using (var searcher = new ManagementObjectSearcher("SELECT SerialNumber FROM Win32_BIOS"))

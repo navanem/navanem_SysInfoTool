@@ -1,134 +1,134 @@
 # BgLight
 
-**BgLight** est un outil léger de type *BGInfo* pour Windows : il dessine un panneau
-d'informations système « premium » sur un fond uni et l'applique automatiquement comme
-fond d'écran. C'est un exécutable *one-shot* (il s'exécute, met à jour le fond, puis se
-termine immédiatement), silencieux, sans interface et sans dépendance externe
-(.NET Framework 4.8, présent d'origine sur Windows 10/11).
+**BgLight** is a lightweight *BGInfo*-like tool for Windows: it draws a "premium" system
+information panel on a solid background and applies it automatically as the desktop
+wallpaper. It is a *one-shot* executable (it runs, updates the wallpaper, then exits
+immediately), silent, with no UI and no external dependency (.NET Framework 4.8, shipped
+by default on Windows 10/11).
 
-![Aperçu du panneau BgLight](docs/screenshot.png)
+![BgLight panel preview](docs/screenshot.png)
 
-> Capture générée avec des données fictives. Sur un poste réel, les valeurs proviennent
-> du système (WMI + API .NET).
+> Preview generated with placeholder data. On a real machine the values come from the
+> system (WMI + .NET APIs).
 
 ---
 
-## Sommaire
+## Table of contents
 
-- [Fonctionnalités](#fonctionnalités)
-- [Informations affichées](#informations-affichées)
-- [Prérequis](#prérequis)
-- [Installation rapide (binaire)](#installation-rapide-binaire)
-- [Utilisation](#utilisation)
-- [Options de ligne de commande](#options-de-ligne-de-commande)
-- [Déploiement en entreprise](#déploiement-en-entreprise)
-- [Compilation depuis les sources](#compilation-depuis-les-sources)
-- [Fonctionnement interne](#fonctionnement-interne)
-- [Dépannage](#dépannage)
+- [Features](#features)
+- [Displayed information](#displayed-information)
+- [Requirements](#requirements)
+- [Quick install (binary)](#quick-install-binary)
+- [Usage](#usage)
+- [Command-line options](#command-line-options)
+- [Enterprise deployment](#enterprise-deployment)
+- [Building from source](#building-from-source)
+- [How it works](#how-it-works)
+- [Troubleshooting](#troubleshooting)
 - [Versions](#versions)
 
 ---
 
-## Fonctionnalités
+## Features
 
-- **Panneau « premium »** : carte sombre translucide à coins arrondis, anti-aliasée.
-- **Position configurable** (par défaut en **haut à droite**).
-- **En-tête** = nom du poste, en gras, souligné d'un **trait d'accent** dont la couleur
-  est configurable (`/accentColor`, bleu `#0078D4` par défaut).
-- **Deux colonnes alignées** (libellé / valeur) pour une lecture nette.
-- **Pied de panneau** : `made by navanem.com` + numéro de version.
-- **Robuste** : chaque source d'information est isolée ; en cas d'échec d'une requête,
-  la valeur affiche `N/A` plutôt que de planter l'outil.
-- **Léger et non résident** : aucun service, aucun processus en arrière-plan ; l'exe se
-  termine dès la mise à jour effectuée.
+- **"Premium" panel**: translucent dark card with rounded, anti-aliased corners.
+- **Configurable position** (defaults to the **top-right** corner).
+- **Header** = computer name, in bold, underlined by an **accent line** whose color is
+  configurable (`/accentColor`, default blue `#0078D4`).
+- **Two aligned columns** (label / value) for clean readability.
+- **Panel footer**: `made by navanem.com` + version number.
+- **Robust**: every information source is isolated; if a query fails, the value shows
+  `N/A` instead of crashing the tool.
+- **Lightweight and non-resident**: no service, no background process; the exe exits as
+  soon as the update is done.
 
-## Informations affichées
+## Displayed information
 
-| Champ | Source |
+| Field | Source |
 |---|---|
-| Nom du poste (titre) | `Win32_ComputerSystem` / `Environment.MachineName` |
-| **User** | session Windows (`DOMAINE\utilisateur`) |
+| Computer name (title) | `Win32_ComputerSystem` / `Environment.MachineName` |
+| **User** | Windows session (`DOMAIN\user`) |
 | **Processor** | `Win32_Processor.Name` |
 | **Serial No.** | `Win32_BIOS.SerialNumber` |
-| **IPv4** | interfaces réseau actives (hors loopback) |
-| **OS** | `Win32_OperatingSystem` (édition + build) |
-| **RAM** | utilisée / totale (`Win32_ComputerSystem` + `Win32_OperatingSystem`) |
-| **Disk (C:)** | libre / total (`Win32_LogicalDisk`) |
-| **Domain** | domaine ou groupe de travail |
-| **Generated** | date/heure de génération |
+| **IPv4** | active network interfaces (excluding loopback) |
+| **OS** | `Win32_OperatingSystem` (edition + build) |
+| **RAM** | used / total (`Win32_ComputerSystem` + `Win32_OperatingSystem`) |
+| **Disk (C:)** | free / total (`Win32_LogicalDisk`) |
+| **Domain** | domain or workgroup |
+| **Generated** | generation date/time |
 
-Les tailles sont affichées en **GB** (gibioctets, base 1024).
+Sizes are shown in **GB** (gibibytes, base 1024).
 
-## Prérequis
+## Requirements
 
-- **Exécution** : Windows 10/11. Le .NET Framework 4.8 est préinstallé sur ces versions.
-- **Compilation** : le SDK .NET suffit (voir [Compilation](#compilation-depuis-les-sources)) ;
-  Visual Studio 2022 fonctionne aussi.
+- **Runtime**: Windows 10/11. .NET Framework 4.8 is preinstalled on those versions.
+- **Build**: the .NET SDK is enough (see [Building from source](#building-from-source));
+  Visual Studio 2022 also works.
 
-## Installation rapide (binaire)
+## Quick install (binary)
 
-1. Télécharger `BgLight-vX.Y.Z.exe` depuis la page
-   [**Releases**](https://github.com/navanem/navanem_SysInfoTool/releases).
-2. (Optionnel) le placer dans `%ProgramData%\BgLight\`.
-3. Le lancer une fois pour vérifier le rendu, puis le planifier (voir
-   [Déploiement](#déploiement-en-entreprise)).
+1. Download `BgLight-vX.Y.Z.exe` from the
+   [**Releases**](https://github.com/navanem/navanem_SysInfoTool/releases) page.
+2. (Optional) place it in `%ProgramData%\BgLight\`.
+3. Run it once to check the rendering, then schedule it (see
+   [Deployment](#enterprise-deployment)).
 
-## Utilisation
+## Usage
 
-Valeurs par défaut (panneau en haut à droite, accent bleu) :
+Defaults (panel in the top-right corner, blue accent):
 
 ```bat
 BgLight.exe
 ```
 
-Avec arguments :
+With arguments:
 
 ```bat
 BgLight.exe /position=TopRight /accentColor=#0078D4 /fontSize=11 /fontName="Segoe UI"
 ```
 
-## Options de ligne de commande
+## Command-line options
 
-Les arguments sont de la forme `/clé=valeur` (insensibles à la casse). Une valeur invalide
-est ignorée et la valeur par défaut est conservée.
+Arguments use the `/key=value` form (case-insensitive). An invalid value is ignored and
+the default is kept.
 
-| Argument | Défaut | Description |
+| Argument | Default | Description |
 |---|---|---|
-| `/outputPath` | `C:\ProgramData\BgLight\wallpaper_info.bmp` | Chemin du BMP généré (et de `log.txt`) |
+| `/outputPath` | `C:\ProgramData\BgLight\wallpaper_info.bmp` | Path of the generated BMP (and of `log.txt`) |
 | `/position` | `TopRight` | `TopLeft`, `TopRight`, `BottomLeft`, `BottomRight` |
-| `/accentColor` | `#0078D4` | Couleur du trait d'accent (hex `#RRGGBB`) |
-| `/bgColor` | `#202020` | Couleur du fond uni (hex) |
-| `/fontSize` | `11` | Taille de police du corps (points) ; le titre est légèrement plus grand |
-| `/fontName` | `Segoe UI` | Police du texte |
+| `/accentColor` | `#0078D4` | Accent line color (hex `#RRGGBB`) |
+| `/bgColor` | `#202020` | Solid background color (hex) |
+| `/fontSize` | `11` | Body font size (points); the title is slightly larger |
+| `/fontName` | `Segoe UI` | Text font |
 
-Le journal d'erreurs (`log.txt`) est créé dans le dossier de `outputPath`.
+The error log (`log.txt`) is created in the `outputPath` folder.
 
-## Déploiement en entreprise
+## Enterprise deployment
 
-### Tâche planifiée (recommandé pour rafraîchir régulièrement)
+### Scheduled task (recommended for periodic refresh)
 
 ```bat
 schtasks /create /tn "BgLight"         /tr "%ProgramData%\BgLight\BgLight.exe" /sc onlogon
 schtasks /create /tn "BgLight-Refresh" /tr "%ProgramData%\BgLight\BgLight.exe" /sc minute /mo 30
 ```
 
-- `onlogon` : à chaque ouverture de session.
-- `/sc minute /mo 30` : rafraîchissement toutes les 30 minutes (utile pour la RAM/disque/IP).
+- `onlogon`: at every sign-in.
+- `/sc minute /mo 30`: refresh every 30 minutes (useful for RAM/disk/IP).
 
-### Script de logon (GPO)
+### Logon script (GPO)
 
-1. Copier `BgLight.exe` dans `\\serveur\partage\BgLight\` ou `%ProgramData%\BgLight\`.
-2. GPO → *Configuration utilisateur > Stratégies > Paramètres Windows > Scripts (ouverture de session)*.
-3. Ajouter `deploy\run-bglight.bat`.
+1. Copy `BgLight.exe` to `\\server\share\BgLight\` or `%ProgramData%\BgLight\`.
+2. GPO → *User Configuration > Policies > Windows Settings > Scripts (Logon)*.
+3. Add `deploy\run-bglight.bat`.
 
-## Compilation depuis les sources
+## Building from source
 
-Le projet cible `net48`. Il référence `Microsoft.NETFramework.ReferenceAssemblies`
-**uniquement pour la compilation**, ce qui permet de construire `net48` avec le seul SDK .NET
-(sans pack de ciblage installé) ; aucune dépendance n'est ajoutée à l'exe livré.
+The project targets `net48`. It references `Microsoft.NETFramework.ReferenceAssemblies`
+**for build only**, which allows building `net48` with just the .NET SDK (no targeting pack
+installed); no dependency is added to the shipped exe.
 
 ```bash
-# Compilation
+# Build
 dotnet build BgLight.sln -c Release
 # -> src/BgLight/bin/Release/net48/BgLight.exe
 
@@ -136,46 +136,47 @@ dotnet build BgLight.sln -c Release
 dotnet test -c Debug
 ```
 
-Avec Visual Studio : ouvrir `BgLight.sln`, configuration **Release**, générer la solution.
+With Visual Studio: open `BgLight.sln`, select the **Release** configuration, build the
+solution.
 
-## Fonctionnement interne
+## How it works
 
-Pipeline *one-shot* exécuté à chaque lancement :
+A *one-shot* pipeline runs on every launch:
 
-1. **`AppConfig.Parse`** — lit les arguments `/clé=valeur` et applique les défauts.
-2. **`SystemInfoCollector.Collect`** — récolte les infos système (WMI + API .NET), chaque
-   source isolée dans son propre `try/catch` (jamais d'exception remontée).
-3. **`WallpaperRenderer.Render`** — dessine le panneau (GDI+) sur un bitmap plein écran et
-   l'enregistre en BMP.
-4. **`WallpaperSetter.Apply`** — applique le BMP comme fond d'écran via `SystemParametersInfo`.
+1. **`AppConfig.Parse`** — reads the `/key=value` arguments and applies defaults.
+2. **`SystemInfoCollector.Collect`** — gathers system info (WMI + .NET APIs), each source
+   isolated in its own `try/catch` (no exception ever escapes).
+3. **`WallpaperRenderer.Render`** — draws the panel (GDI+) on a full-screen bitmap and
+   saves it as a BMP.
+4. **`WallpaperSetter.Apply`** — applies the BMP as the wallpaper via `SystemParametersInfo`.
 
-Découpage des sources :
+Source layout:
 
-| Fichier | Rôle |
+| File | Responsibility |
 |---|---|
-| `Program.cs` | Orchestration one-shot + gestion d'erreurs racine |
-| `AppConfig.cs` | Analyse des arguments et valeurs par défaut |
-| `SystemInfoCollector.cs` | Collecte des informations système |
-| `SystemInfoData.cs` | Modèle de données (titre + lignes libellé/valeur) |
-| `Format.cs` | Formatage (tailles en GB, jointures) |
-| `WallpaperRenderer.cs` | Rendu GDI+ du panneau |
-| `WallpaperSetter.cs` | Application du fond d'écran (P/Invoke) |
-| `Logger.cs` | Journalisation des erreurs |
+| `Program.cs` | One-shot orchestration + root error handling |
+| `AppConfig.cs` | Argument parsing and defaults |
+| `SystemInfoCollector.cs` | System information collection |
+| `SystemInfoData.cs` | Data model (title + label/value rows) |
+| `Format.cs` | Formatting (GB sizes, joins) |
+| `WallpaperRenderer.cs` | GDI+ rendering of the panel |
+| `WallpaperSetter.cs` | Wallpaper application (P/Invoke) |
+| `Logger.cs` | Error logging |
 
-## Dépannage
+## Troubleshooting
 
-- **Le fond ne change pas / `log.txt` mentionne un accès refusé** : choisir un
-  `outputPath` accessible en écriture (ex. un dossier sous `%LOCALAPPDATA%`), ou exécuter
-  avec des droits suffisants sur `%ProgramData%`.
-- **Une stratégie GPO « fond d'écran imposé » est active** : elle peut écraser le fond.
-  Désactiver la stratégie ou déployer le BMP via cette même stratégie.
-- **Valeurs `N/A`** : la requête WMI correspondante a échoué (droits, pilote, WMI
-  corrompu) ; les autres champs restent renseignés.
+- **Wallpaper does not change / `log.txt` reports access denied**: choose a writable
+  `outputPath` (e.g. a folder under `%LOCALAPPDATA%`), or run with sufficient rights on
+  `%ProgramData%`.
+- **A "forced wallpaper" GPO policy is active**: it can override the wallpaper. Disable the
+  policy or deploy the BMP through that same policy.
+- **`N/A` values**: the corresponding WMI query failed (permissions, driver, corrupted
+  WMI); the other fields stay populated.
 
 ## Versions
 
-Voir [`CHANGELOG.md`](CHANGELOG.md) et la page
-[Releases](https://github.com/navanem/navanem_SysInfoTool/releases).
+See [`CHANGELOG.md`](CHANGELOG.md) and the
+[Releases](https://github.com/navanem/navanem_SysInfoTool/releases) page.
 
 ---
 
